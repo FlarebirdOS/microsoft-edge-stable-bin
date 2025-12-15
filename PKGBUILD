@@ -2,8 +2,8 @@ pkgname=microsoft-edge-stable-bin
 _pkgname=microsoft-edge
 _pkgshortname=msedge
 _channel=stable
-pkgver=142.0.3595.94
-pkgrel=2
+pkgver=143.0.3650.80
+pkgrel=3
 pkgdesc="A browser that combines a minimal design with sophisticated technology to make the web faster, safer, and easier"
 arch=('x86_64')
 url="https://www.microsoftedgeinsider.com/en-us/download"
@@ -32,7 +32,7 @@ conflicts=(
 options=('!strip' '!zipman')
 source=(https://packages.microsoft.com/repos/edge/pool/main/m/${_pkgname}-${_channel}/${_pkgname}-${_channel}_${pkgver}-1_amd64.deb
     microsoft-edge-stable.sh)
-sha256sums=(3fe98f5e0d20556aa526a052d85fd3b9fe36062927b4f3b447af77c0f0122907
+sha256sums=(528877731d82c3b01fe1f3622b7b0fdefa69a633f4bc7b8c1582bc9e07d08f00
     dc3765d2de6520b13f105b8001aa0e40291bc9457ac508160b23eea8811e26af)
 
 package() {
@@ -63,4 +63,11 @@ package() {
     install -m755 microsoft-edge-stable.sh ${pkgdir}/usr/bin/microsoft-edge-stable
 
     rm ${pkgdir}/opt/microsoft/${_pkgshortname}/product_logo_*.png
+
+    # 修复在 Wayland 无法切换中文输入的问题 (fcitx5)
+    pushd ${pkgdir}/usr/share/applications
+        for f in {com.microsoft.Edge,microsoft-edge}.desktop
+    do
+        sed -i 's|^Exec=/usr/bin/microsoft-edge-stable %U$|Exec=/usr/bin/microsoft-edge-stable --ozone-platform=x11 %U|' ${f}
+    done
 }
